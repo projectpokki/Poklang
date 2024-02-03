@@ -1,0 +1,2 @@
+say str 2 Hello world!
+end
