@@ -1,3 +1,4 @@
+- Takes a string input and prints it out vertically
 var a
 var b
 var c
