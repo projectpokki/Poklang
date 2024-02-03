@@ -1,0 +1,8 @@
+- Takes a number for an input, and prints out doule the value
+var a
+
+input a
+ston a a
+mul a a num 2
+say a
+end
