@@ -1,2 +1,2 @@
-say str 2 Hello world!
+say str 2 Hello, World!
 end
