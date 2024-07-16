@@ -1,9 +1,11 @@
-# Poklang (Prototype version)
-Poklang is a lightweight, dynamic, imperative, unstructured programming language. It revolves around chaining "commands" (very basic functions/instructions) to manipulate variables. There are 31 commands in Poklang, allowing for basic math operations, string manipulation, console IO and boolean logic. variables can be nums (floats), strs or bools. I finished making this on February 2, 2024.
+# Poklang
+Poklang is a lightweight, dynamic, imperative, unstructured programming language. Poklang is able to do basic math operations, string manipulation, console IO and boolean operations. I finished making this on February 2, 2024.
 
-There is an interpreter for the prototpe version of Poklang in the ```Poklang prototype``` file. 4 python files, ```main.py```, ```LexerModule.py```, ```ParserModule.py``` and ```ExecutorModule.py```, work together to interpret Poklang code. ```PoklangInterpreter.py``` is all 4 python files joined together as one. The file that is run is ```Poklang.txt```. As per tradition, there is a script that prints "Hello, World!".
+There is an interpreter for Poklang in the ```Poklang``` folder. 4 python files, ```main.py```, ```LexerModule.py```, ```ParserModule.py``` and ```ExecutorModule.py```, work together to interpret Poklang code. ```PoklangInterpreter.py``` is all 4 python files joined together as one. The file that is run is ```Poklang.txt```.
 
-The language itself has many problems, like the lack of array manipulation, file IO, bitwise operations, structure, and ternary operators. The interpreter is also buggy and does not catch errors. Even though there are commands called "if" and "for", they are just special jump statements and do not provide any structure to the code.
+Poklang has many problems and limitations. Its interpreter is also buggy. This is more of a prototype for Poklang++ than a practical programming language.
 
 # Poklang++
-Poklang++ is a lightweight, static, imperative, structured programming language. It is the improved version of Poklang. I did not finish the interpreter yet.
+Poklang++ is a lightweight, static, imperative, structured programming language. It is an improved version of Poklang. Poklang++ is able to do advanced math operations, string and array manipulation, console and file IO, boolean and bitwise operations, ASCII-number conversion, and do time related tasks. I finished making this on July 16, 2024.
+
+The interpreter for Poklang++ is in the ```Poklang++``` folder. ```Pkl-Interpreter.py``` will ask for a file to interpret when it is run the first time. There are also examples of Poklang++ code in the folder.
