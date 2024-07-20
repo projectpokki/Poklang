@@ -4,7 +4,7 @@ from os.path import exists
 from time import sleep, time
 
 fileToRun = ""
-
+fileToRun = "poklang.txt"
 
 #functions and resources
 parserLineNumber = 0
@@ -16,24 +16,31 @@ funcs = {}
 startingLine = -1
 
 parserErrorText: list = [
-    "instruction is malformed", "pointer does not exist", "malformed token",
-    "token has invalid type", "file does not exist or is in invalid format",
-    "instruction does not exist", "negative indentation",
-    "name of pointer or constant is already used",
-    "loop or condition not closed properly",
-    "main code block already initialised",
-    "instruction cannot used outside code block or does not exist",
-    "constant or variable is declared after main code block"
+  "instruction is malformed",
+  "variable does not exist",
+  "token is malformed",
+  "token has invalid type",
+  "file does not exist or is in invalid format",
+  "instruction does not exist",
+  "negative indentation",
+  "name of variable, constant or function is already used",
+  "loop or condition is not closed properly",
+  "main code block is already initialised",
+  "instruction cannot used outside code block, or does not exist",
+  "constant or variable is declared after main code block",
+  "string is not closed properly"
 ]
 
 runtimeErrorText: list = [
-    "index has invalid range", "attempt to wait for negative time",
-    "attempt to create array with negative length",
-    "input outside domain of math function",
-    "division by 0, output is undefined", "pointer has no value",
-    "reached end of file but program is not ended",
-    "attempt to give a pointer a value of different type",
-    "attempt to convert non-numeric string to int or float"
+  "index has invalid range",
+  "attempt to wait for negative time",
+  "attempt to create array with negative length",
+  "input outside domain of math function",
+  "division by 0, output is undefined",
+  "pointer has no value",
+  "reached end of file but program is not ended",
+  "attempt to give a pointer a value of different type",
+  "attempt to convert non-numeric string to int or float"
 ]
 
 types: list = ["int", "float", "bool", "char", "arr", "str"]
@@ -73,6 +80,8 @@ def encodeVarOrConst(input):
     input = input.replace("\\t", "\t")
     input = input.replace("\\b", "\b")
     input = input.replace("\\\\", "\\")
+    input = input.replace("\\\'", "\"")
+    input = input.replace("\\c", "#")
     if len(input) > 3:
       return "cs" + input[1:-1]
     else:
@@ -160,16 +169,21 @@ with open(__file__, "r") as selfR:
 with open(fileToRun, "r") as code:
   #format
   formattedCode = []
-  for line in code.read().splitlines():
+  for lineNum, line in enumerate(code.read().splitlines()):
     formattedLine = []
-    for sectNum, sect in enumerate(line.split("#")[0].strip().split("\"")):
+    commentlessLine = line.split("#")[0].strip()
+    if commentlessLine.count("\"") % 2 == 1:
+      parserLineNumber = lineNum
+      printParserError(12)
+    for sectNum, sect in enumerate(commentlessLine.split("\"")):
       if sectNum % 2 == 1:
         formattedLine.append("\"" + sect + "\"")
       else:
         formattedLine += sect.split()
     formattedCode.append(formattedLine)
-  
+
   #parse file
+  parserLineNumber = 0
   indentationLevel = 0
   indentationType = [""]
   loopStartLocations = [0]
