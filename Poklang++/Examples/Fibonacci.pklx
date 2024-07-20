@@ -1,0 +1,13 @@
+var int i j k l
+
+start
+  set i < 0
+  set j < 1
+  stdout "0: 0\n1: 1\n"
+  for l < 2 20 1
+    add k < i j
+    stdout l ": " k "\n"
+    set i < j
+    set j < k
+  endloop
+end
