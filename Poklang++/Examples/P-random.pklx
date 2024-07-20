@@ -1,0 +1,11 @@
+#print pseudorandom number between 0 and 1 based on time
+
+var float i
+start
+  unixtime i
+  mod i < i 0.01
+  add i < i 0.00001 #prevent division by 0
+  div i < 0.137 i
+  mod i < i 1
+  stdout i
+end
