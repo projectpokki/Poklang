@@ -1,0 +1,32 @@
+var arr numbers
+var int num i j jPlus1 a b
+var bool aLargerThanb
+
+start
+  setarr numbers < 1 5 14 3 -4 #set starting numbers
+  stdout "starting numbers: " #print starting numbers
+  for i < 1 5 1
+    indget num < numbers i
+    stdout num " "
+  endloop
+  stdout "\n"
+
+  for i < 4 1 -1 #bubble sort
+    for j < 1 i 1
+      add jPlus1 < j 1
+      indget a < numbers j
+      indget b < numbers jPlus1
+      grt aLargerThanb < a b
+      if aLargerThanb
+        indset numbers j < b
+        indset numbers jPlus1 < a
+      endcond
+    endloop
+  endloop
+
+  stdout "sorted numbers: " #print sorted numbers
+  for i < 1 5 1
+    indget num < numbers i
+    stdout num " "
+  endloop
+end
