@@ -4,7 +4,7 @@ from os.path import exists
 from time import sleep, time
 
 fileToRun = ""
-fileToRun = "poklang.txt"
+
 
 #functions and resources
 parserLineNumber = 0
@@ -14,6 +14,7 @@ vars: list = []
 consts = {}
 funcs = {}
 startingLine = -1
+functionLayer = 0
 
 parserErrorText: list = [
   "instruction is malformed",
@@ -37,9 +38,9 @@ runtimeErrorText: list = [
   "attempt to create array with negative length",
   "input outside domain of math function",
   "division by 0, output is undefined",
-  "pointer has no value",
+  "variable has no value",
   "reached end of file but program is not ended",
-  "attempt to give a pointer a value of different type",
+  "attempt to give a variable a value of different type",
   "attempt to convert non-numeric string to int or float"
 ]
 
@@ -53,7 +54,7 @@ def printParserError(errorType):
 
 
 def printRuntimeError(errorType):
-  print("RUNTIME ERROR - LINE " + str(parserLineNumber + 1) + ": " +
+  print("RUNTIME ERROR - LINE " + str(execLineNumber[functionLayer] + 1) + ": " +
         runtimeErrorText[errorType])
   exit()
 
@@ -128,9 +129,9 @@ def getNumberValue(input):
 
 def getBoolValue(input):
   if input[0] == "v":
-    if varIDs[int(input[2:])] is None:
+    if vars[int(input[2:])] is None:
       printRuntimeError(5)
-    return bool(varIDs[int(input[2:])])
+    return bool(vars[int(input[2:])])
   if input[2] == "1":
     return True
   return False
@@ -418,14 +419,17 @@ with open(fileToRun, "r") as code:
       else: printParserError(0)
 
     elif line[0] == "forcelen":
-      if line[2] == "<" and len(line) == 4:
+      if line[2] == "<" and len(line) == 5:
         line[1] = encodeVar(line[1])
         if line[1] is None: printParserError(1)
         if line[1][1] != "a": printParserError(3)
         line[2] = encodeVarOrConst(line[3])
-        if line[2] is None: printParserError(2)
-        if line[2][1] != "i": printParserError(3)
-        line.pop(3)
+        if line[2] is None: printParserError(1)
+        if line[2][1] != "a": printParserError(3)
+        line[3] = encodeVarOrConst(line[4])
+        if line[3] is None: printParserError(2)
+        if line[3][1] != "i": printParserError(3)
+        line.pop(4)
       else: printParserError(0)
 
     #Types
@@ -668,10 +672,10 @@ with open(fileToRun, "r") as code:
           indentationType[indentationLevel] = "loop"
         indentationLevel += 1
         line.append(indentationLevel)
-        if indentationLevel >= len(loopStartLocations):
+        if indentationLevel - 2 >= len(loopStartLocations):
           loopStartLocations.append(parserLineNumber)
         else:
-          loopStartLocations[indentationLevel] = parserLineNumber
+          loopStartLocations[indentationLevel - 2] = parserLineNumber
       else: printParserError(0)
 
     elif line[0] == "for":
@@ -695,10 +699,10 @@ with open(fileToRun, "r") as code:
           indentationType[indentationLevel] = "loop"
         indentationLevel += 1
         line.append(indentationLevel)
-        if indentationLevel >= len(loopStartLocations):
+        if indentationLevel - 2 >= len(loopStartLocations):
           loopStartLocations.append(parserLineNumber)
         else:
-          loopStartLocations[indentationLevel] = parserLineNumber
+          loopStartLocations[indentationLevel - 2] = parserLineNumber
       else: printParserError(0)
 
     elif line[0] in ["break", "continue"]:
@@ -717,7 +721,7 @@ with open(fileToRun, "r") as code:
       if indentationLevel <= 0: printParserError(6)
       if indentationType[indentationLevel - 1] != "loop": printParserError(8)
       if len(line) == 1:
-        line.append(loopStartLocations[indentationLevel - 1])
+        line.append(loopStartLocations[indentationLevel - 2])
         line.append(indentationLevel)
         indentationLevel -= 1
       else: printParserError(0)
@@ -853,19 +857,19 @@ with open(fileToRun, "r") as code:
           printRuntimeError(0)
 
       elif line[0] == "indset":
-        index = getNumberValue(line[2])
+        index = int(getNumberValue(line[2])) - 1
         if index <= len(vars[int(line[1][2:])]) - 1 and index >= 0:
           if line[1][1] == "a":
-            vars[int(line[1][2:])][getValue(line[2])] = getValue(line[3])
+            vars[int(line[1][2:])][index] = getValue(line[3])
           else:
             vars[int(line[1][2:])] = list(vars[int(line[1][2:])])
-            vars[int(line[1][2:])][getValue(line[2])] = getValue(line[3])
+            vars[int(line[1][2:])][index] = getValue(line[3])
             vars[int(line[1][2:])] = "".join(vars[int(line[1][2:])])
         else:
           printRuntimeError(0)
 
       elif line[0] == "indget": #"int", "float", "bool", "char", "arr", "str"
-        index = int(getNumberValue(line[3]))
+        index = int(getNumberValue(line[3])) - 1
         if index <= len(getValue(line[2])) - 1 and index >= 0:
           indexValue = getValue(line[2])[index]
           if (isinstance(indexValue, int) and line[1][1] == "i") or (isinstance(indexValue, float) and line[1][1] == "f") or (isinstance(indexValue, bool) and line[1][1] == "b"):
@@ -899,12 +903,12 @@ with open(fileToRun, "r") as code:
         vars[int(line[1][2:])] = len(getValue(line[2]))
 
       elif line[0] == "forcelen":
-        length = int(getNumberValue(line[2]))
+        length = int(getNumberValue(line[3]))
         if length >= 0:
-          if length < len(vars[int(line[1][2:])]):
-            vars[int(line[1][2:])] = deepcopy(vars[int(line[1][2:])])[:length]
-          elif length > len(vars[int(line[1][2:])]):
-            vars[int(line[1][2:])] = vars[int(line[1][2:])] + [None] * int(length - len(vars[int(line[1][2:])]))
+          if length < len(vars[int(line[2][2:])]):
+            vars[int(line[1][2:])] = deepcopy(vars[int(line[2][2:])])[:length]
+          elif length > len(vars[int(line[2][2:])]):
+            vars[int(line[1][2:])] = deepcopy(vars[int(line[2][2:])]) + [None] * int(length - len(vars[int(line[2][2:])]))
         else:
           printRuntimeError(2)
 
